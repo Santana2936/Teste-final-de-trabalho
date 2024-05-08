@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor Lai e Italo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #F0000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            animation: backgroundFlow 30s infinite linear;
+        }
+
+        @keyframes backgroundFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto; /* Centraliza o container */
+            padding: 20px; /* Adiciona um espaçamento interno */
+            background: #333;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden; /* Garante que nada seja cortado */
+            animation: popIn 0.5s ease forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            background: #202020;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 4px solid #4caf50;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 500;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        select, textarea, button {
+            width: calc(100% - 40px); /* Calcula a largura correta */
+            margin: 10px; /* Espaçamento uniforme */
+            padding: 12px;
+            background: #2c2c2c;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box; /* Inclui padding na largura total */
+            transition: all 0.3s ease;
+        }
+
+        select:hover, textarea:hover, button:hover {
+            background: #3a3a3a;
+        }
+
+        select:not(:hover) {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        button {
+            background-color: #4caf50;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            will-change: transform;
+        }
+
+        button:hover {
+            background-color: #43a047;
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        /* Animação de foco nos campos */
+        select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4caf50;
+        }
+
+        /* Animação de carregamento no botão */
+        button.loading {
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        button.loading::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 3px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tradutor Lai e Italo</h1>
+        </div>
+        <div class="idiomas">
+            <select id="idioma-fonte">
+                <option value="pt">Português</option>
+                <option value="en">Inglês</option>
+                <option value="es">Espanhol</option>
+            </select>
+            <select id="idioma-alvo">
+                <option value="en">Inglês</option>
+                <option value="pt">Português</option>
+                <option value="es">Espanhol</option>
+            </select>
+        </div>
+        <div class="entrada">
+            <textarea id="texto-entrada" placeholder="Digite o texto..."></textarea>
+        </div>
+        <div class="saida">
+            <textarea id="texto-saida" placeholder="Tradução..."></textarea>
+        </div>
+        <button onclick="traduzir()">Traduzir</button>
+    </div>
+
+    <script>
+        function traduzir() {
+            var textoEntrada = document.getElementById("texto-entrada").value;
+            var idiomaOrigem = document.getElementById("idioma-fonte").value;
+            var idiomaDestino = document.getElementById("idioma-alvo").value;
+            var apiKey = "4544-2+S9L39K";
+            var secretKey = "798PQi21yZWZ37JMS7/D/aXqk0Q62ja4jrLjx3jslWMb";
+
+            console.log("Texto de entrada:", textoEntrada);
+            console.log("Idioma de origem:", idiomaOrigem);
+            console.log("Idioma de destino:", idiomaDestino);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://api.gotit.ai/Translation/v1.1/Translate", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-GOTIT-Api-Key", apiKey);
+            xhr.setRequestHeader("X-GOTIT-Secret-Key", secretKey);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    console.log("Status da resposta:", xhr.status);
+                    console.log("Resposta:", xhr.responseText);
+                    if (xhr.status === 200) {
+                        var resposta = JSON.parse(xhr.responseText);
+                        if (resposta && resposta.Translation) {
+                            document.getElementById("texto-saida").value = resposta.Translation;
+                        } else {
+                            document.getElementById("texto-saida").value = "Erro na tradução";
+                        }
+                    } else {
+                        document.getElementById("texto-saida").value = "Erro na solicitação";
+                    }
+                }
+            };
+            var data = JSON.stringify({
+                "Text": textoEntrada,
+                "From": idiomaOrigem,
+                "To": idiomaDestino
+            });
+            xhr.send(data);
+        }
+    </script>
+</body>
+</html>
